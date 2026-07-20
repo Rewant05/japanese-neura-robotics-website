@@ -18,16 +18,16 @@ export function InteriorPage({ pageKey }: { pageKey: InteriorPageKey }) {
   return (
     <main data-interior-page className="relative min-h-screen overflow-hidden pt-20">
       <InteriorMotionStage pageKey={pageKey} />
-      <section className="interior-hero relative z-10 flex min-h-[76vh] items-end overflow-hidden pb-16 pt-32">
+      <section className="interior-hero relative z-10 flex min-h-[58vh] items-end overflow-hidden pb-12 pt-28 md:min-h-[64vh] md:pb-14">
         <Image
           src="/images/neura-lab-poster.png"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="interior-hero-media object-cover opacity-44"
+          className="interior-hero-media object-cover opacity-[.34]"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,7,.94),rgba(5,6,7,.55)_52%,rgba(5,6,7,.88))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,7,.9),rgba(5,6,7,.62)_52%,rgba(5,6,7,.9))]" />
         <div className="container-x interior-reveal relative z-10">
           <p className="hud-label text-cyan">{page.label}</p>
           <h1 className="mt-5 max-w-5xl text-5xl font-semibold uppercase leading-tight text-white md:text-7xl">
@@ -53,7 +53,7 @@ export function InteriorPage({ pageKey }: { pageKey: InteriorPageKey }) {
         </div>
       </section>
 
-      <section className="container-x relative z-10 py-24">
+      <section className="container-x relative z-10 py-16 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[.72fr_1fr]">
           <aside className="interior-reveal sticky top-28 h-fit">
             <p className="hud-label text-cyan">システム概要</p>
@@ -94,7 +94,7 @@ export function InteriorPage({ pageKey }: { pageKey: InteriorPageKey }) {
 
       <PageSpecific pageKey={pageKey} />
 
-      <section className="container-x relative z-10 pb-24">
+      <section className="container-x relative z-10 pb-16 md:pb-20">
         <div className="interior-card tech-border grid gap-8 p-6 md:p-9 lg:grid-cols-[1fr_auto]">
           <div>
             <p className="hud-label text-cyan">次の窓口</p>
@@ -122,7 +122,7 @@ export function InteriorPage({ pageKey }: { pageKey: InteriorPageKey }) {
 function PageSpecific({ pageKey }: { pageKey: InteriorPageKey }) {
   if (pageKey === "robotics") {
     return (
-      <section className="container-x relative z-10 pb-24">
+      <section className="container-x relative z-10 pb-16 md:pb-20">
         <div className="grid gap-4 md:grid-cols-2">
           {productLines.map((product) => (
             <div key={product.name} className="interior-card border-t border-white/12 py-6">
@@ -141,7 +141,7 @@ function PageSpecific({ pageKey }: { pageKey: InteriorPageKey }) {
 
   if (pageKey === "research") {
     return (
-      <section className="container-x relative z-10 pb-24">
+      <section className="container-x relative z-10 pb-16 md:pb-20">
         <div className="border-l border-cyan/35 pl-7">
           {timeline.slice(0, 5).map((item) => (
             <div key={item.year} className="interior-card relative pb-10">
@@ -160,10 +160,10 @@ function PageSpecific({ pageKey }: { pageKey: InteriorPageKey }) {
 
   if (pageKey === "laboratory") {
     return (
-      <section className="container-x relative z-10 pb-24">
+      <section className="container-x relative z-10 pb-16 md:pb-20">
         <div className="grid gap-4 lg:grid-cols-5">
           {labZones.map((zone) => (
-            <div key={zone.name} className="interior-card tech-border min-h-56 p-5">
+            <div key={zone.name} className="interior-card tech-border min-h-48 p-5">
               <p className="jp-label text-sm text-cyan">{zone.jp}</p>
               <h3 className="mt-4 text-xl font-semibold uppercase text-white">
                 {zone.name}
@@ -178,7 +178,7 @@ function PageSpecific({ pageKey }: { pageKey: InteriorPageKey }) {
 
   if (pageKey === "careers") {
     return (
-      <section className="container-x relative z-10 pb-24">
+      <section className="container-x relative z-10 pb-16 md:pb-20">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {roles.map((role) => (
             <Link
@@ -199,10 +199,10 @@ function PageSpecific({ pageKey }: { pageKey: InteriorPageKey }) {
 
   if (pageKey === "news") {
     return (
-      <section className="container-x relative z-10 pb-24">
+      <section className="container-x relative z-10 pb-16 md:pb-20">
         <div className="grid gap-5 lg:grid-cols-3">
           {pages.news.sections.map((item, index) => (
-            <article key={item.title} className="interior-card tech-border min-h-72 p-6">
+            <article key={item.title} className="interior-card tech-border min-h-60 p-6">
               <p className="font-mono text-xs text-cyan">通信-0{index + 1}</p>
               <h3 className="mt-5 text-2xl font-semibold uppercase text-white">
                 {item.title}

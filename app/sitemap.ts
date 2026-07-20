@@ -3,7 +3,7 @@ import { navItems, site } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const utilityRoutes = ["/privacy-policy", "/terms-of-use"];
+  const utilityRoutes = ["/privacy-policy", "/terms-of-service"];
 
   return [...navItems.map((item) => item.href), ...utilityRoutes].map(
     (route) => ({

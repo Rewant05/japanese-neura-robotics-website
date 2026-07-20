@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <main data-interior-page className="relative min-h-screen overflow-hidden pt-28">
+    <main data-interior-page className="relative min-h-screen overflow-hidden pt-24">
       <InteriorMotionStage pageKey="contact" />
-      <section className="container-x interior-reveal relative z-10 py-16">
+      <section className="container-x interior-reveal relative z-10 py-12 md:py-14">
         <p className="hud-label text-cyan">お問い合わせ / 東京研究所</p>
         <h1 className="mt-5 max-w-5xl text-5xl font-semibold uppercase leading-tight text-white md:text-7xl">
           安全な通信窓口を開く。
@@ -23,8 +23,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="container-x relative z-10 grid gap-6 pb-20 lg:grid-cols-[.92fr_1.08fr]">
-        <div className="interior-card tech-border relative min-h-[620px] overflow-hidden p-6">
+      <section className="container-x relative z-10 grid gap-6 pb-14 md:pb-20 lg:grid-cols-[.82fr_1.18fr]">
+        <div className="interior-card tech-border relative min-h-[420px] overflow-hidden p-5 md:min-h-[520px] md:p-6">
           <div className="absolute inset-8 border border-white/10" />
           <div className="absolute left-[56%] top-[42%] h-4 w-4 bg-cyan shadow-[0_0_28px_rgba(56,232,255,.9)]" />
           <div className="absolute left-[52%] top-[38%] h-28 w-28 border border-cyan/35" />

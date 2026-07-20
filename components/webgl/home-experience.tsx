@@ -57,12 +57,12 @@ export function HomeExperience() {
     <Canvas
       className="absolute inset-0"
       camera={{ position: [0, 1.25, 7], fov: mobile ? 46 : 38 }}
-      dpr={[1, mobile ? 1.1 : 1.5]}
+      dpr={[1, mobile ? 1 : 1.18]}
       frameloop={inView ? "always" : "demand"}
       gl={{
-        antialias: !mobile,
+        antialias: false,
         alpha: true,
-        powerPreference: "high-performance",
+        powerPreference: "default",
       }}
     >
       <color attach="background" args={["#050607"]} />
@@ -85,7 +85,7 @@ function ScrollScene({
 }) {
   const progress = useRef(0);
   const pointer = useRef({ x: 0, y: 0 });
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
   const target = useMemo(() => new THREE.Vector3(), []);
   const lookAt = useMemo(() => new THREE.Vector3(0, 0.75, 0), []);
 
@@ -128,7 +128,6 @@ function ScrollScene({
       THREE.MathUtils.lerp(0, -1.6, rangeProgress(p, 0.45, 0.78)),
     );
     camera.lookAt(lookAt);
-    gl.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.1 : 1.5));
   });
 
   return (
@@ -142,7 +141,7 @@ function ScrollScene({
       <NeuralGraph progress={progress} reducedMotion={reducedMotion} />
       <FactoryScene progress={progress} />
       <SwarmAndHands progress={progress} pointer={pointer} mobile={mobile} />
-      <ParticleField count={mobile ? 90 : 220} />
+      <ParticleField count={mobile ? 36 : 120} />
     </group>
   );
 }
@@ -542,7 +541,7 @@ function SwarmAndHands({
 
   return (
     <group ref={group}>
-      <SwarmBots progress={progress} pointer={pointer} count={mobile ? 120 : 360} />
+      <SwarmBots progress={progress} pointer={pointer} count={mobile ? 72 : 220} />
       <ApproachingHands progress={progress} />
     </group>
   );

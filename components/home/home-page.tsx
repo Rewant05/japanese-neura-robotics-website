@@ -68,9 +68,11 @@ export function HomePage() {
             y: 0,
             duration: 0.9,
             ease: "power3.out",
+            immediateRender: false,
             scrollTrigger: {
               trigger: block,
-              start: "top 82%",
+              start: "top 90%",
+              once: true,
             },
           },
         );
@@ -108,14 +110,15 @@ export function HomePage() {
       const track = document.querySelector<HTMLElement>(".product-track");
       if (track && window.matchMedia("(min-width: 1024px)").matches && !reduceMotion) {
         gsap.to(track, {
-          x: () => -(track.scrollWidth - window.innerWidth + 64),
+          x: () => -Math.max(0, track.scrollWidth - window.innerWidth + 48),
           ease: "none",
           scrollTrigger: {
             trigger: "#robotics-platform",
-            start: "top top",
-            end: () => `+=${Math.max(900, track.scrollWidth - window.innerWidth + 640)}`,
+            start: "top 8%",
+            end: () => `+=${Math.max(720, track.scrollWidth - window.innerWidth + 260)}`,
             scrub: 0.75,
             pin: true,
+            anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         });
@@ -305,7 +308,7 @@ function RoboticsPlatform() {
   return (
     <section
       id="robotics-platform"
-      className="chapter-section relative min-h-screen overflow-hidden py-28"
+      className="chapter-section relative min-h-[88vh] overflow-hidden py-20 md:py-24"
     >
       <div className="container-x">
         <SectionIntro
@@ -436,7 +439,7 @@ function MiniModel({ index }: { index: number }) {
 
 function NeuralEngine() {
   return (
-    <section id="neural-engine" className="chapter-section py-28">
+    <section id="neural-engine" className="chapter-section py-20 md:py-24">
       <div className="container-x grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]">
         <SectionIntro
           eyebrow="02 / 神経知能エンジン"
@@ -527,7 +530,7 @@ function NeuralNetworkPanel() {
 
 function HumanoidAnatomy() {
   return (
-    <section id="anatomy" className="chapter-section py-28">
+    <section id="anatomy" className="chapter-section py-20 md:py-24">
       <div className="container-x grid gap-12 lg:grid-cols-[.85fr_1.15fr]">
         <SectionIntro
           eyebrow="03 / 人型構造"
@@ -571,7 +574,7 @@ function HumanoidAnatomy() {
 
 function IndustrialRobotics() {
   return (
-    <section id="industrial" className="chapter-section py-28">
+    <section id="industrial" className="chapter-section py-20 md:py-24">
       <div className="container-x">
         <SectionIntro
           eyebrow="04 / 産業ロボティクス"
@@ -625,7 +628,7 @@ function IndustrialRobotics() {
 
 function HumanAugmentation() {
   return (
-    <section id="augmentation" className="chapter-section py-28">
+    <section id="augmentation" className="chapter-section py-20 md:py-24">
       <div className="container-x grid gap-12 lg:grid-cols-2">
         <div>
           <SectionIntro
@@ -689,7 +692,7 @@ function SwarmIntelligence() {
   return (
     <section
       id="swarm"
-      className="chapter-section py-28"
+      className="chapter-section py-20 md:py-24"
       onPointerMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         setCursor({
@@ -746,7 +749,7 @@ function SwarmIntelligence() {
 
 function ResearchTimeline() {
   return (
-    <section id="timeline" className="chapter-section py-28">
+    <section id="timeline" className="chapter-section py-20 md:py-24">
       <div className="container-x">
         <SectionIntro
           eyebrow="07 / 研究年表"
@@ -787,7 +790,7 @@ function Laboratory() {
   const zone = labZones[activeZone];
 
   return (
-    <section id="laboratory" className="chapter-section py-28">
+    <section id="laboratory" className="chapter-section py-20 md:py-24">
       <div className="container-x grid gap-12 lg:grid-cols-[.9fr_1.1fr]">
         <SectionIntro
           eyebrow="08 / 研究所"
@@ -845,7 +848,7 @@ function Laboratory() {
 
 function FutureManifesto() {
   return (
-    <section id="manifesto" className="chapter-section relative overflow-hidden py-32">
+    <section id="manifesto" className="chapter-section relative overflow-hidden py-20 md:py-24">
       <div className="absolute inset-x-0 top-12 text-center text-6xl font-semibold uppercase text-white/[.035] md:text-9xl">
         人間の未来を拡張する知能
       </div>
@@ -864,7 +867,7 @@ function FutureManifesto() {
 
 function Careers() {
   return (
-    <section id="careers" className="chapter-section py-28">
+    <section id="careers" className="chapter-section py-20 md:py-24">
       <div className="container-x grid gap-12 lg:grid-cols-[.85fr_1.15fr]">
         <SectionIntro
           eyebrow="10 / 採用"
@@ -898,7 +901,7 @@ function Careers() {
 
 function ContactHandoff() {
   return (
-    <section id="contact" className="chapter-section pb-28 pt-10">
+    <section id="contact" className="chapter-section pb-20 pt-8 md:pb-24">
       <div className="container-x">
         <div className="tech-border grid gap-10 overflow-hidden p-6 md:p-10 lg:grid-cols-[1fr_.8fr]">
           <div>

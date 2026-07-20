@@ -92,7 +92,8 @@ textarea:focus-visible {
   .tech-border {
     position: relative;
     border: 1px solid var(--line);
-    background: rgba(9, 11, 13, 0.7);
+    background: rgba(11, 15, 18, 0.88);
+    backdrop-filter: blur(10px);
   }
 
   .tech-border::before,

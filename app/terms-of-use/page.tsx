@@ -31,7 +31,7 @@ const sections = [
 
 export default function Page() {
   return (
-    <main data-interior-page className="relative min-h-screen overflow-hidden pt-32">
+    <main data-interior-page className="relative min-h-screen overflow-hidden pt-28">
       <InteriorMotionStage pageKey="legal" />
       <div className="container-x relative z-10">
         <div className="interior-reveal">
@@ -44,7 +44,7 @@ export default function Page() {
             そのインタラクティブなロボティクスコンテンツの利用について定めます。
           </p>
         </div>
-        <div className="mt-14 space-y-5 pb-24">
+        <div className="mt-12 space-y-4 pb-16 md:pb-20">
           {sections.map(([title, body]) => (
             <section key={title} className="interior-card border-t border-white/12 py-7">
               <h2 className="text-2xl font-semibold uppercase text-white">{title}</h2>

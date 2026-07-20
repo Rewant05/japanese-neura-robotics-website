@@ -78,9 +78,11 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
             y: 0,
             duration: 0.85,
             ease: "power3.out",
+            immediateRender: false,
             scrollTrigger: {
               trigger: node,
-              start: "top 84%",
+              start: "top 92%",
+              once: true,
             },
           },
         );
@@ -101,9 +103,11 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
             duration: 0.7,
             delay: Math.min(index * 0.035, 0.18),
             ease: "power2.out",
+            immediateRender: false,
             scrollTrigger: {
               trigger: node,
-              start: "top 86%",
+              start: "top 92%",
+              once: true,
             },
           },
         );
@@ -118,9 +122,11 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
             autoAlpha: 1,
             duration: 0.65,
             ease: "power2.out",
+            immediateRender: false,
             scrollTrigger: {
               trigger: node,
-              start: "top 88%",
+              start: "top 94%",
+              once: true,
             },
           },
         );
@@ -173,12 +179,12 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
         className="interior-gridline absolute left-0 top-[64%] h-px w-full origin-right scale-x-0 opacity-0"
         style={{ backgroundColor: palette.secondary }}
       />
-      {canRender ? (
+      {canRender && !mobile ? (
         <Canvas
-          className="absolute inset-0 opacity-70"
-          camera={{ position: [0, 0.9, mobile ? 7.4 : 6.2], fov: mobile ? 48 : 39 }}
-          dpr={[1, mobile ? 1.1 : 1.45]}
-          gl={{ antialias: !mobile, alpha: true, powerPreference: "high-performance" }}
+          className="absolute inset-0 opacity-[.46]"
+          camera={{ position: [0, 0.9, 6.2], fov: 39 }}
+          dpr={[1, 1.12]}
+          gl={{ antialias: false, alpha: true, powerPreference: "default" }}
         >
           <color attach="background" args={["#050607"]} />
           <fog attach="fog" args={["#050607", 7, 17]} />
@@ -210,7 +216,7 @@ function InteriorScene({
 }) {
   const progress = useRef(0);
   const pointer = useRef({ x: 0, y: 0 });
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
   const target = useMemo(() => new THREE.Vector3(), []);
   const lookAt = useMemo(() => new THREE.Vector3(0, 0.35, 0), []);
 
@@ -248,7 +254,6 @@ function InteriorScene({
     camera.position.lerp(target, 1 - Math.pow(0.001, delta));
     lookAt.set(pointer.current.x * 0.12, 0.25 + pointer.current.y * 0.08, -0.75);
     camera.lookAt(lookAt);
-    gl.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.1 : 1.45));
   });
 
   return (
@@ -257,7 +262,7 @@ function InteriorScene({
       <DataConstellation
         progress={progress}
         pointer={pointer}
-        count={mobile ? 90 : 190}
+        count={mobile ? 0 : 108}
         pageKey={pageKey}
         palette={palette}
       />
@@ -296,7 +301,7 @@ function KineticRings({
           key={radius}
           rotation={[index * 0.45, index * 0.3, index * 0.18]}
         >
-          <torusGeometry args={[radius, 0.009 + index * 0.002, 8, 160]} />
+          <torusGeometry args={[radius, 0.009 + index * 0.002, 8, 96]} />
           <meshBasicMaterial
             color={index === 1 ? palette.secondary : palette.primary}
             transparent

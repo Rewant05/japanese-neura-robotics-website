@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { FuturisticNav } from "@/components/navigation/futuristic-nav";
+import { SiteFooter } from "@/components/shared/site-footer";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body>
         <FuturisticNav />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

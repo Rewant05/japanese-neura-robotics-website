@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Menu, RadioTower, X } from "lucide-react";
+import { ArrowUpRight, Menu, RadioTower, ShieldCheck, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { navItems, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ export function FuturisticNav() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-graphite/72 backdrop-blur-xl">
+      <header className="fixed inset-x-0 top-0 z-[70] border-b border-white/10 bg-graphite/[.82] backdrop-blur-xl">
         <nav
           className="container-x flex h-20 items-center justify-between gap-5"
           aria-label="メインナビゲーション"
@@ -100,14 +100,14 @@ export function FuturisticNav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-40 bg-graphite/96 pt-24 text-white"
+            className="fixed inset-0 z-[60] overflow-y-auto bg-graphite/[.98] pt-20 text-white"
             initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
             animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
             exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
             transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="container-x grid h-[calc(100vh-96px)] grid-cols-1 gap-10 py-8 lg:grid-cols-[1fr_.7fr]">
-              <div className="flex flex-col justify-center">
+            <div className="container-x grid min-h-[calc(100svh-80px)] grid-cols-1 gap-8 py-6 lg:grid-cols-[1fr_.62fr] lg:py-8">
+              <div className="flex flex-col justify-start">
                 {navItems.map((item, index) => (
                   <motion.div
                     key={item.href}
@@ -117,17 +117,17 @@ export function FuturisticNav() {
                   >
                     <Link
                       href={item.href}
-                      className="group flex items-end justify-between border-t border-white/10 py-4 text-4xl font-semibold uppercase text-white transition hover:text-cyan md:text-6xl"
+                      className="group flex items-end justify-between gap-4 border-t border-white/10 py-3 text-3xl font-semibold uppercase leading-none text-white transition hover:text-cyan sm:text-4xl md:py-4 md:text-5xl xl:text-6xl"
                     >
-                      <span>{item.label}</span>
-                      <span className="jp-label text-sm font-normal text-white/40 group-hover:text-cyan">
+                      <span className="min-w-0 break-words">{item.label}</span>
+                      <span className="jp-label shrink-0 text-right text-xs font-normal text-white/40 group-hover:text-cyan sm:text-sm">
                         {item.jp}
                       </span>
                     </Link>
                   </motion.div>
                 ))}
               </div>
-              <aside className="tech-border scanline self-end p-6">
+              <aside className="tech-border scanline self-start p-5 md:p-6 lg:sticky lg:top-24">
                 <p className="hud-label">東京研究所リンク</p>
                 <p className="mt-5 max-w-md text-xl text-white/82">
                   人を知覚し、環境に適応し、人と共に進化する自律機械。
@@ -137,6 +137,25 @@ export function FuturisticNav() {
                   <span className="text-right text-cyan">稼働中</span>
                   <span>安全経路</span>
                   <span className="text-right text-laser">スキャン中</span>
+                </div>
+                <div className="mt-8 border-t border-white/10 pt-5">
+                  <p className="hud-label">法務リンク</p>
+                  <div className="mt-4 grid gap-3 text-sm text-white/62">
+                    <Link
+                      href="/privacy-policy"
+                      className="inline-flex items-center gap-3 transition hover:text-cyan"
+                    >
+                      <ShieldCheck size={16} className="text-cyan" />
+                      プライバシーポリシー
+                    </Link>
+                    <Link
+                      href="/terms-of-service"
+                      className="inline-flex items-center gap-3 transition hover:text-cyan"
+                    >
+                      <ShieldCheck size={16} className="text-cyan" />
+                      利用規約
+                    </Link>
+                  </div>
                 </div>
               </aside>
             </div>
