@@ -62,16 +62,16 @@ export function HomePage() {
       revealBlocks.forEach((block) => {
         gsap.fromTo(
           block,
-          { autoAlpha: 0, y: reduceMotion ? 0 : 34 },
+          { autoAlpha: 0, y: reduceMotion ? 0 : 20 },
           {
             autoAlpha: 1,
             y: 0,
-            duration: 0.9,
+            duration: 0.58,
             ease: "power3.out",
             immediateRender: false,
             scrollTrigger: {
               trigger: block,
-              start: "top 90%",
+              start: "top 96%",
               once: true,
             },
           },
@@ -108,16 +108,32 @@ export function HomePage() {
       });
 
       const track = document.querySelector<HTMLElement>(".product-track");
-      if (track && window.matchMedia("(min-width: 1024px)").matches && !reduceMotion) {
+      const trackShell = document.querySelector<HTMLElement>(".product-track-shell");
+      if (
+        track &&
+        trackShell &&
+        window.matchMedia("(min-width: 1024px)").matches &&
+        !reduceMotion
+      ) {
+        const panels = gsap.utils.toArray<HTMLElement>(".product-panel");
+        gsap.set(panels, { autoAlpha: 1, y: 0 });
         gsap.to(track, {
-          x: () => -Math.max(0, track.scrollWidth - window.innerWidth + 48),
+          x: () =>
+            -Math.max(
+              0,
+              track.scrollWidth - Math.min(window.innerWidth - 32, 1440),
+            ),
           ease: "none",
           scrollTrigger: {
-            trigger: "#robotics-platform",
-            start: "top 8%",
-            end: () => `+=${Math.max(720, track.scrollWidth - window.innerWidth + 260)}`,
-            scrub: 0.75,
-            pin: true,
+            trigger: trackShell,
+            start: "top 16%",
+            end: () =>
+              `+=${Math.max(
+                620,
+                track.scrollWidth - Math.min(window.innerWidth - 32, 1440) + 120,
+              )}`,
+            scrub: 0.45,
+            pin: trackShell,
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
@@ -141,7 +157,12 @@ export function HomePage() {
       });
     }, rootRef);
 
-    return () => ctx.revert();
+    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+
+    return () => {
+      window.clearTimeout(refreshTimer);
+      ctx.revert();
+    };
   }, [reduceMotion]);
 
   const handleLoaderDone = useCallback(() => setLoaderDone(true), []);
@@ -205,9 +226,9 @@ function HeroSection({ loaderDone }: { loaderDone: boolean }) {
       className="chapter-section container-x relative flex min-h-screen items-center pt-28"
     >
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={loaderDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        initial={false}
+        animate={{ opacity: loaderDone ? 1 : 0.98, y: 0 }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
         className="max-w-5xl pb-16"
       >
         <div className="mb-8 grid max-w-full gap-3 text-xs text-white/62 sm:flex sm:flex-wrap sm:items-center">
@@ -284,20 +305,32 @@ function SectionIntro({
   title,
   jp,
   body,
+  compact = false,
 }: {
   eyebrow: string;
   title: string;
   jp?: string;
   body: string;
+  compact?: boolean;
 }) {
   return (
     <div className="reveal-block max-w-4xl">
       <p className="hud-label text-cyan">{eyebrow}</p>
-      <h2 className="mt-4 text-4xl font-semibold uppercase leading-tight text-white md:text-6xl">
+      <h2
+        className={cn(
+          "mt-4 font-semibold uppercase leading-tight text-white",
+          compact ? "text-3xl md:text-5xl" : "text-4xl md:text-6xl",
+        )}
+      >
         {title}
       </h2>
       {jp ? <p className="jp-label mt-4 text-xl text-white/42">{jp}</p> : null}
-      <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 md:text-lg">
+      <p
+        className={cn(
+          "max-w-2xl text-base leading-7 text-white/62 md:text-lg",
+          compact ? "mt-4" : "mt-6",
+        )}
+      >
         {body}
       </p>
     </div>
@@ -308,7 +341,7 @@ function RoboticsPlatform() {
   return (
     <section
       id="robotics-platform"
-      className="chapter-section relative min-h-[88vh] overflow-hidden py-20 md:py-24"
+      className="chapter-section relative min-h-[74vh] overflow-hidden py-12 md:py-14"
     >
       <div className="container-x">
         <SectionIntro
@@ -316,12 +349,15 @@ function RoboticsPlatform() {
           title="四つの身体を、ひとつの知能層で動かす。"
           jp="ロボットの身体、ひとつの知能。"
           body="ニューラのシステムは共通の知覚と制御スタックを共有しながら、人の空間、工場、リハビリ、分散点検に合わせて身体の形を変えます。"
+          compact
         />
       </div>
-      <div className="product-track container-x mt-14 flex flex-col gap-5 lg:w-max lg:flex-row">
-        {productLines.map((product, index) => (
-          <ProductPanel key={product.name} product={product} index={index} />
-        ))}
+      <div className="product-track-shell container-x mt-4 overflow-visible">
+        <div className="product-track flex flex-col gap-5 lg:w-max lg:flex-row">
+          {productLines.map((product, index) => (
+            <ProductPanel key={product.name} product={product} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -337,8 +373,8 @@ function ProductPanel({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <article className="group tech-border grid min-h-[560px] w-full grid-cols-1 overflow-hidden lg:w-[640px] lg:grid-cols-[.86fr_1fr]">
-      <div className="relative min-h-[260px] border-b border-white/10 bg-black/40 p-5 lg:border-b-0 lg:border-r">
+    <article className="product-panel group tech-border grid min-h-[360px] w-full grid-cols-1 overflow-hidden will-change-transform lg:w-[580px] lg:grid-cols-[.8fr_1fr]">
+      <div className="relative min-h-[190px] border-b border-white/10 bg-black/40 p-4 lg:border-b-0 lg:border-r">
         <MiniModel index={index} />
         <div className="absolute left-5 top-5 border border-cyan/30 bg-graphite/70 px-3 py-2 font-mono text-xs text-cyan">
           {product.code}
@@ -348,17 +384,17 @@ function ProductPanel({
           <span className="h-2 w-2 bg-cyan shadow-[0_0_20px_rgba(56,232,255,.9)]" />
         </div>
       </div>
-      <div className="flex flex-col p-6">
+      <div className="flex flex-col p-5">
         <p className="jp-label text-sm text-cyan">{product.jp}</p>
-        <h3 className="mt-3 text-3xl font-semibold uppercase text-white">
+        <h3 className="mt-2 text-2xl font-semibold uppercase text-white">
           {product.name}
         </h3>
-        <p className="mt-5 leading-7 text-white/62">{product.detail}</p>
-        <div className="mt-8 space-y-3">
+        <p className="mt-4 text-sm leading-6 text-white/62">{product.detail}</p>
+        <div className="mt-5 space-y-2">
           {product.metrics.map((metric) => (
             <div
               key={metric}
-              className="flex items-center justify-between border-t border-white/10 py-3 text-sm"
+              className="flex items-center justify-between border-t border-white/10 py-2 text-sm"
             >
               <span className="text-white/56">{metric}</span>
               <Check size={16} className="text-cyan" />
@@ -368,7 +404,7 @@ function ProductPanel({
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="mt-auto inline-flex w-fit items-center gap-3 border border-white/16 px-4 py-3 text-sm text-white transition hover:border-cyan/45 hover:text-cyan"
+          className="mt-auto inline-flex w-fit items-center gap-3 border border-white/16 px-4 py-2.5 text-sm text-white transition hover:border-cyan/45 hover:text-cyan"
         >
           {expanded ? <Minus size={16} /> : <Plus size={16} />}
           技術詳細

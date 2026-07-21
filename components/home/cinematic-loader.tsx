@@ -28,25 +28,37 @@ export function CinematicLoader({ onDone }: { onDone: () => void }) {
         setProgress(100);
         setVisible(false);
         onDone();
-      }, 650);
+      }, 180);
       return () => window.clearTimeout(shortTimer);
     }
 
-    const interval = window.setInterval(() => {
-      setProgress((value) => {
-        const next = Math.min(100, value + (value < 70 ? 4 : 2));
-        if (next >= 100) {
-          window.clearInterval(interval);
-          window.setTimeout(() => {
-            setVisible(false);
-            onDone();
-          }, 520);
-        }
-        return next;
-      });
-    }, 76);
+    let raf = 0;
+    let doneTimer = 0;
+    const duration = window.matchMedia("(max-width: 768px)").matches ? 460 : 680;
+    const startedAt = performance.now();
 
-    return () => window.clearInterval(interval);
+    const tick = (now: number) => {
+      const progressRatio = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progressRatio, 2);
+      setProgress(Math.round(eased * 100));
+
+      if (progressRatio >= 1) {
+        doneTimer = window.setTimeout(() => {
+          setVisible(false);
+          onDone();
+        }, 120);
+        return;
+      }
+
+      raf = window.requestAnimationFrame(tick);
+    };
+
+    raf = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(doneTimer);
+    };
   }, [onDone, reduceMotion]);
 
   return (

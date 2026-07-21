@@ -72,16 +72,16 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
       gsap.utils.toArray<HTMLElement>(".interior-reveal").forEach((node) => {
         gsap.fromTo(
           node,
-          { autoAlpha: 0, y: reducedMotion ? 0 : 36 },
+          { autoAlpha: 0, y: reducedMotion ? 0 : 18 },
           {
             autoAlpha: 1,
             y: 0,
-            duration: 0.85,
+            duration: 0.56,
             ease: "power3.out",
             immediateRender: false,
             scrollTrigger: {
               trigger: node,
-              start: "top 92%",
+              start: "top 98%",
               once: true,
             },
           },
@@ -93,20 +93,20 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
           node,
           {
             autoAlpha: 0,
-            y: reducedMotion ? 0 : 28,
-            rotateX: reducedMotion ? 0 : -7,
+            y: reducedMotion ? 0 : 16,
+            rotateX: reducedMotion ? 0 : -3,
           },
           {
             autoAlpha: 1,
             y: 0,
             rotateX: 0,
-            duration: 0.7,
-            delay: Math.min(index * 0.035, 0.18),
+            duration: 0.48,
+            delay: Math.min(index * 0.02, 0.1),
             ease: "power2.out",
             immediateRender: false,
             scrollTrigger: {
               trigger: node,
-              start: "top 92%",
+              start: "top 98%",
               once: true,
             },
           },
@@ -168,9 +168,9 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-graphite"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#0b0f12]"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,7,.88),rgba(5,6,7,.42)_50%,rgba(5,6,7,.9))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,7,.68),rgba(5,6,7,.18)_50%,rgba(5,6,7,.72)),linear-gradient(180deg,rgba(255,255,255,.035),rgba(5,6,7,.42))]" />
       <div
         className="interior-gridline absolute left-0 top-[28%] h-px w-full origin-left scale-x-0 bg-cyan/24 opacity-0"
         style={{ backgroundColor: palette.primary }}
@@ -181,16 +181,17 @@ export function InteriorMotionStage({ pageKey }: { pageKey: string }) {
       />
       {canRender && !mobile ? (
         <Canvas
-          className="absolute inset-0 opacity-[.46]"
+          className="absolute inset-0 opacity-[.3]"
           camera={{ position: [0, 0.9, 6.2], fov: 39 }}
-          dpr={[1, 1.12]}
-          gl={{ antialias: false, alpha: true, powerPreference: "default" }}
+          dpr={[0.85, 1]}
+          gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
+          performance={{ min: 0.55 }}
         >
-          <color attach="background" args={["#050607"]} />
-          <fog attach="fog" args={["#050607", 7, 17]} />
-          <ambientLight intensity={0.28} />
-          <pointLight position={[3, 3, 3]} intensity={2} color={palette.primary} />
-          <pointLight position={[-3, 1.4, -2]} intensity={1.4} color={palette.secondary} />
+          <color attach="background" args={["#0b0f12"]} />
+          <fog attach="fog" args={["#0b0f12", 8, 17]} />
+          <ambientLight intensity={0.34} />
+          <pointLight position={[3, 3, 3]} intensity={1.35} color={palette.primary} />
+          <pointLight position={[-3, 1.4, -2]} intensity={0.9} color={palette.secondary} />
           <InteriorScene
             mobile={mobile}
             pageKey={pageKey}
@@ -262,7 +263,7 @@ function InteriorScene({
       <DataConstellation
         progress={progress}
         pointer={pointer}
-        count={mobile ? 0 : 108}
+        count={mobile ? 0 : 72}
         pageKey={pageKey}
         palette={palette}
       />
@@ -301,11 +302,11 @@ function KineticRings({
           key={radius}
           rotation={[index * 0.45, index * 0.3, index * 0.18]}
         >
-          <torusGeometry args={[radius, 0.009 + index * 0.002, 8, 96]} />
+          <torusGeometry args={[radius, 0.009 + index * 0.002, 8, 72]} />
           <meshBasicMaterial
             color={index === 1 ? palette.secondary : palette.primary}
             transparent
-            opacity={0.34 - index * 0.06}
+            opacity={0.24 - index * 0.045}
           />
         </mesh>
       ))}
@@ -382,7 +383,7 @@ function DataConstellation({
         emissive={palette.secondary}
         emissiveIntensity={0.35}
         transparent
-        opacity={0.78}
+        opacity={0.64}
       />
     </instancedMesh>
   );

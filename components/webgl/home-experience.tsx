@@ -57,20 +57,21 @@ export function HomeExperience() {
     <Canvas
       className="absolute inset-0"
       camera={{ position: [0, 1.25, 7], fov: mobile ? 46 : 38 }}
-      dpr={[1, mobile ? 1 : 1.18]}
-      frameloop={inView ? "always" : "demand"}
+      dpr={[0.85, 1]}
+      frameloop={inView && !reducedMotion ? "always" : "demand"}
       gl={{
         antialias: false,
         alpha: true,
         powerPreference: "default",
       }}
+      performance={{ min: 0.55 }}
     >
-      <color attach="background" args={["#050607"]} />
-      <fog attach="fog" args={["#050607", 7, 18]} />
-      <ambientLight intensity={0.24} />
-      <directionalLight position={[4, 6, 3]} intensity={2.2} color="#eafcff" />
-      <pointLight position={[-4, 2.2, 3]} intensity={1.7} color="#38e8ff" />
-      <pointLight position={[2.5, 0.6, -1]} intensity={1.2} color="#ff2f46" />
+      <color attach="background" args={["#0b0f12"]} />
+      <fog attach="fog" args={["#0b0f12", 8, 18]} />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[4, 6, 3]} intensity={1.8} color="#eafcff" />
+      <pointLight position={[-4, 2.2, 3]} intensity={1.25} color="#38e8ff" />
+      <pointLight position={[2.5, 0.6, -1]} intensity={0.85} color="#ff2f46" />
       <ScrollScene mobile={mobile} reducedMotion={reducedMotion} />
     </Canvas>
   );
@@ -100,6 +101,10 @@ function ScrollScene({
       },
     });
 
+    if (reducedMotion) {
+      return () => trigger.kill();
+    }
+
     const move = (event: PointerEvent) => {
       pointer.current.x = (event.clientX / window.innerWidth - 0.5) * 2;
       pointer.current.y = (event.clientY / window.innerHeight - 0.5) * 2;
@@ -110,7 +115,7 @@ function ScrollScene({
       trigger.kill();
       window.removeEventListener("pointermove", move);
     };
-  }, []);
+  }, [reducedMotion]);
 
   useFrame(({ clock }, delta) => {
     const p = reducedMotion ? 0.08 : progress.current;
@@ -141,7 +146,7 @@ function ScrollScene({
       <NeuralGraph progress={progress} reducedMotion={reducedMotion} />
       <FactoryScene progress={progress} />
       <SwarmAndHands progress={progress} pointer={pointer} mobile={mobile} />
-      <ParticleField count={mobile ? 36 : 120} />
+      <ParticleField count={mobile ? 0 : 72} />
     </group>
   );
 }
@@ -163,11 +168,11 @@ function LaboratoryChamber({ progress }: { progress: ProgressRef }) {
         <meshStandardMaterial color="#111820" metalness={0.8} roughness={0.28} transparent opacity={0.32} />
       </mesh>
       <mesh position={[0, 0.9, 0]} rotation={[0, 0, 0]}>
-        <torusGeometry args={[1.52, 0.012, 8, 128]} />
+        <torusGeometry args={[1.52, 0.012, 8, 80]} />
         <meshStandardMaterial color="#38e8ff" emissive="#38e8ff" emissiveIntensity={1.2} />
       </mesh>
       <mesh position={[0, 0.9, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.72, 0.01, 8, 128]} />
+        <torusGeometry args={[1.72, 0.01, 8, 80]} />
         <meshStandardMaterial color="#ffffff" transparent opacity={0.25} />
       </mesh>
       {[-1.55, 1.55].map((x) => (
@@ -419,7 +424,7 @@ function NeuralGraph({
     <group ref={graph}>
       {nodes.map((node, index) => (
         <mesh key={index} position={node}>
-          <sphereGeometry args={[0.045, 12, 12]} />
+          <sphereGeometry args={[0.045, 8, 8]} />
           <meshStandardMaterial color="#38e8ff" emissive="#38e8ff" emissiveIntensity={1.2} />
         </mesh>
       ))}
@@ -541,7 +546,7 @@ function SwarmAndHands({
 
   return (
     <group ref={group}>
-      <SwarmBots progress={progress} pointer={pointer} count={mobile ? 72 : 220} />
+      <SwarmBots progress={progress} pointer={pointer} count={mobile ? 0 : 140} />
       <ApproachingHands progress={progress} />
     </group>
   );
@@ -660,10 +665,10 @@ function ParticleField({ count }: { count: number }) {
   return (
     <Sparkles
       count={count}
-      speed={0.18}
-      opacity={0.48}
+      speed={0.12}
+      opacity={0.36}
       color="#38e8ff"
-      size={1.3}
+      size={1}
       scale={[7, 4, 7]}
       position={[0, 0.6, -1]}
     />

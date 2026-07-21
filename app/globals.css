@@ -92,8 +92,8 @@ textarea:focus-visible {
   .tech-border {
     position: relative;
     border: 1px solid var(--line);
-    background: rgba(11, 15, 18, 0.88);
-    backdrop-filter: blur(10px);
+    background: rgba(13, 18, 22, 0.94);
+    box-shadow: 0 18px 52px rgba(0, 0, 0, 0.22);
   }
 
   .tech-border::before,
@@ -152,5 +152,13 @@ textarea:focus-visible {
   }
   100% {
     transform: translateY(100%);
+  }
+}
+
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  .scanline::after {
+    animation: none;
+    opacity: 0.28;
+    transform: translateY(0);
   }
 }
