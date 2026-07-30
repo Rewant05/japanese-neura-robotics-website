@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowDown,
   ArrowRight,
@@ -31,8 +29,6 @@ import {
 } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-gsap.registerPlugin(ScrollTrigger);
-
 const chapters = [
   { id: "hero", label: "導入" },
   { id: "robotics-platform", label: "基盤" },
@@ -57,7 +53,19 @@ export function HomePage() {
   useEffect(() => {
     if (!rootRef.current) return;
 
-    const ctx = gsap.context(() => {
+    let active = true;
+    let cleanup = () => {};
+
+    void (async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      if (!active || !rootRef.current) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const ctx = gsap.context(() => {
       const revealBlocks = gsap.utils.toArray<HTMLElement>(".reveal-block");
       revealBlocks.forEach((block) => {
         gsap.fromTo(
@@ -155,13 +163,19 @@ export function HomePage() {
           },
         );
       });
-    }, rootRef);
+      }, rootRef);
 
-    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+      const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+
+      cleanup = () => {
+        window.clearTimeout(refreshTimer);
+        ctx.revert();
+      };
+    })();
 
     return () => {
-      window.clearTimeout(refreshTimer);
-      ctx.revert();
+      active = false;
+      cleanup();
     };
   }, [reduceMotion]);
 
@@ -724,17 +738,57 @@ function HumanAugmentation() {
 }
 
 function SwarmIntelligence() {
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+  const nodesRef = useRef<Array<HTMLSpanElement | null>>([]);
+  const cursorRef = useRef({ x: 0, y: 0 });
+  const frameRef = useRef<number | null>(null);
+
+  const scheduleNodeUpdate = useCallback(() => {
+    if (frameRef.current !== null) return;
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      const { x, y } = cursorRef.current;
+
+      nodesRef.current.forEach((node, index) => {
+        if (!node) return;
+        const row = Math.floor(index / 16);
+        const col = index % 16;
+        node.style.transform = `translate3d(${x * (col - 8) * 1.8}px, ${y * (row - 6) * 1.8}px, 0)`;
+      });
+    });
+  }, []);
+
+  const updateCursor = useCallback(
+    (element: HTMLElement, clientX: number, clientY: number) => {
+      const rect = element.getBoundingClientRect();
+      cursorRef.current = {
+        x: (clientX - rect.left) / rect.width - 0.5,
+        y: (clientY - rect.top) / rect.height - 0.5,
+      };
+      scheduleNodeUpdate();
+    },
+    [scheduleNodeUpdate],
+  );
+
+  useEffect(
+    () => () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+    },
+    [],
+  );
+
   return (
     <section
       id="swarm"
       className="chapter-section py-20 md:py-24"
       onPointerMove={(event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        setCursor({
-          x: (event.clientX - rect.left) / rect.width - 0.5,
-          y: (event.clientY - rect.top) / rect.height - 0.5,
-        });
+        updateCursor(event.currentTarget, event.clientX, event.clientY);
+      }}
+      onPointerLeave={() => {
+        cursorRef.current = { x: 0, y: 0 };
+        scheduleNodeUpdate();
       }}
     >
       <div className="container-x grid gap-12 lg:grid-cols-[.9fr_1.1fr]">
@@ -750,17 +804,18 @@ function SwarmIntelligence() {
             {Array.from({ length: 192 }).map((_, index) => {
               const row = Math.floor(index / 16);
               const col = index % 16;
-              const dx = cursor.x * (col - 8) * 1.8;
-              const dy = cursor.y * (row - 6) * 1.8;
               const isLogo = (row === 5 && col > 3 && col < 12) || (col === 4 && row > 5 && row < 11) || (col === 11 && row > 5 && row < 11);
               return (
                 <span
                   key={index}
+                  ref={(node) => {
+                    nodesRef.current[index] = node;
+                  }}
                   className={cn(
                     "h-2.5 w-2.5 bg-white/24 transition-transform duration-200",
                     isLogo && "bg-cyan shadow-[0_0_14px_rgba(56,232,255,.8)]",
                   )}
-                  style={{ transform: `translate3d(${dx}px, ${dy}px, 0)` }}
+                  style={{ transform: "translate3d(0px, 0px, 0)" }}
                 />
               );
             })}

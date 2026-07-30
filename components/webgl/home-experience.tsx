@@ -2,13 +2,9 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Line, Sparkles } from "@react-three/drei";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 import * as THREE from "three";
-
-gsap.registerPlugin(ScrollTrigger);
 
 type ProgressRef = MutableRefObject<number>;
 type PointerRef = MutableRefObject<{ x: number; y: number }>;
@@ -91,18 +87,33 @@ function ScrollScene({
   const lookAt = useMemo(() => new THREE.Vector3(0, 0.75, 0), []);
 
   useEffect(() => {
-    const trigger = ScrollTrigger.create({
-      trigger: "#home-story",
-      start: "top top",
-      end: "bottom bottom",
-      scrub: true,
-      onUpdate: (self) => {
-        progress.current = self.progress;
-      },
-    });
+    let active = true;
+    let trigger: { kill: () => void } | null = null;
+
+    void (async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      if (!active) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+      trigger = ScrollTrigger.create({
+        trigger: "#home-story",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
+        onUpdate: (self) => {
+          progress.current = self.progress;
+        },
+      });
+    })();
 
     if (reducedMotion) {
-      return () => trigger.kill();
+      return () => {
+        active = false;
+        trigger?.kill();
+      };
     }
 
     const move = (event: PointerEvent) => {
@@ -112,7 +123,8 @@ function ScrollScene({
     window.addEventListener("pointermove", move, { passive: true });
 
     return () => {
-      trigger.kill();
+      active = false;
+      trigger?.kill();
       window.removeEventListener("pointermove", move);
     };
   }, [reducedMotion]);
@@ -157,7 +169,11 @@ function LaboratoryChamber({ progress }: { progress: ProgressRef }) {
   useFrame(() => {
     if (!chamber.current) return;
     const p = progress.current;
-    chamber.current.visible = p < 0.58;
+    if (p >= 0.58) {
+      chamber.current.visible = false;
+      return;
+    }
+    chamber.current.visible = true;
     chamber.current.rotation.y = THREE.MathUtils.lerp(0, -0.35, rangeProgress(p, 0, 0.35));
   });
 
@@ -245,9 +261,13 @@ function HumanoidRobot({
   useFrame(({ clock }) => {
     if (!robot.current) return;
     const p = progress.current;
+    if (p >= 0.63) {
+      robot.current.visible = false;
+      return;
+    }
+    robot.current.visible = true;
     const sideTurn = rangeProgress(p, 0.05, 0.24);
     const zoomEye = rangeProgress(p, 0.18, 0.38);
-    robot.current.visible = p < 0.63;
     robot.current.rotation.y =
       THREE.MathUtils.lerp(0.04, Math.PI * 0.72, sideTurn) +
       pointer.current.x * 0.08;
@@ -411,7 +431,11 @@ function NeuralGraph({
     const p = progress.current;
     const appear = rangeProgress(p, 0.24, 0.44);
     const fade = 1 - rangeProgress(p, 0.62, 0.74);
-    graph.current.visible = appear > 0.02 && fade > 0.02;
+    if (appear <= 0.02 || fade <= 0.02) {
+      graph.current.visible = false;
+      return;
+    }
+    graph.current.visible = true;
     const scale = THREE.MathUtils.lerp(0.22, 1.45, appear) * fade;
     graph.current.scale.setScalar(scale);
     graph.current.rotation.y =
@@ -454,7 +478,11 @@ function FactoryScene({ progress }: { progress: ProgressRef }) {
     const p = progress.current;
     const appear = rangeProgress(p, 0.52, 0.66);
     const fade = 1 - rangeProgress(p, 0.78, 0.88);
-    factory.current.visible = appear > 0.02 && fade > 0.02;
+    if (appear <= 0.02 || fade <= 0.02) {
+      factory.current.visible = false;
+      return;
+    }
+    factory.current.visible = true;
     factory.current.position.set(0, -1.1, THREE.MathUtils.lerp(-2.2, 0.2, appear));
     factory.current.scale.setScalar(THREE.MathUtils.lerp(0.7, 1.15, appear) * fade);
     if (armA.current) armA.current.rotation.z = Math.sin(clock.elapsedTime * 1.1) * 0.22;
@@ -539,7 +567,11 @@ function SwarmAndHands({
     if (!group.current) return;
     const p = progress.current;
     const appear = rangeProgress(p, 0.72, 0.86);
-    group.current.visible = appear > 0.02;
+    if (appear <= 0.02) {
+      group.current.visible = false;
+      return;
+    }
+    group.current.visible = true;
     group.current.position.y = THREE.MathUtils.lerp(-0.65, 0.05, appear);
     group.current.scale.setScalar(THREE.MathUtils.lerp(0.72, 1.05, appear));
   });
@@ -565,8 +597,13 @@ function SwarmBots({
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   useFrame(({ clock }) => {
-    if (!mesh.current) return;
+    if (!mesh.current || count <= 0) return;
     const p = progress.current;
+    if (p < 0.7) {
+      mesh.current.visible = false;
+      return;
+    }
+    mesh.current.visible = true;
     const logo = rangeProgress(p, 0.78, 0.92);
     for (let i = 0; i < count; i += 1) {
       const angle = (i / count) * Math.PI * 2;
@@ -610,12 +647,17 @@ function ApproachingHands({ progress }: { progress: ProgressRef }) {
   useFrame(() => {
     const p = progress.current;
     const hand = rangeProgress(p, 0.88, 1);
+    if (hand <= 0.02) {
+      if (left.current) left.current.visible = false;
+      if (right.current) right.current.visible = false;
+      return;
+    }
     if (left.current) {
-      left.current.visible = hand > 0.02;
+      left.current.visible = true;
       left.current.position.x = THREE.MathUtils.lerp(-2.7, -0.72, hand);
     }
     if (right.current) {
-      right.current.visible = hand > 0.02;
+      right.current.visible = true;
       right.current.position.x = THREE.MathUtils.lerp(2.7, 0.72, hand);
     }
   });

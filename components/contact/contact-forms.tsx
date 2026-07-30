@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { Send } from "lucide-react";
-import { z } from "zod";
 
 const inquiryTypes = [
   "研究提携",
@@ -11,15 +10,14 @@ const inquiryTypes = [
   "一般お問い合わせ",
 ] as const;
 
-const contactSchema = z.object({
-  name: z.string().min(2, "お名前は2文字以上で入力してください。"),
-  email: z.string().email("有効なメールアドレスを入力してください。"),
-  organization: z.string().max(120).optional(),
-  inquiryType: z.enum(inquiryTypes),
-  message: z.string().min(20, "お問い合わせ内容は20文字以上で入力してください。"),
-});
-
-type ContactInput = z.infer<typeof contactSchema>;
+type InquiryType = (typeof inquiryTypes)[number];
+type ContactInput = {
+  name: string;
+  email: string;
+  organization?: string;
+  inquiryType: InquiryType;
+  message: string;
+};
 type ContactErrors = Partial<Record<keyof ContactInput, string>>;
 
 const initialState: ContactInput = {
@@ -29,6 +27,29 @@ const initialState: ContactInput = {
   inquiryType: "研究提携",
   message: "",
 };
+
+async function validateContactInput(input: ContactInput) {
+  const { z } = await import("zod");
+  const contactSchema = z.object({
+    name: z.string().min(2, "お名前は2文字以上で入力してください。"),
+    email: z.string().email("有効なメールアドレスを入力してください。"),
+    organization: z.string().max(120).optional(),
+    inquiryType: z.enum(inquiryTypes),
+    message: z.string().min(20, "お問い合わせ内容は20文字以上で入力してください。"),
+  });
+
+  const parsed = contactSchema.safeParse(input);
+  if (parsed.success) {
+    return { ok: true as const, data: parsed.data };
+  }
+
+  const errors: ContactErrors = {};
+  parsed.error.issues.forEach((issue) => {
+    const key = issue.path[0] as keyof ContactInput;
+    errors[key] = issue.message;
+  });
+  return { ok: false as const, errors };
+}
 
 export function ContactForms() {
   return (
@@ -71,14 +92,9 @@ function InquiryForm({
     setStatus("idle");
     setErrors({});
 
-    const parsed = contactSchema.safeParse(form);
-    if (!parsed.success) {
-      const nextErrors: ContactErrors = {};
-      parsed.error.issues.forEach((issue) => {
-        const key = issue.path[0] as keyof ContactInput;
-        nextErrors[key] = issue.message;
-      });
-      setErrors(nextErrors);
+    const parsed = await validateContactInput(form);
+    if (!parsed.ok) {
+      setErrors(parsed.errors);
       return;
     }
 
